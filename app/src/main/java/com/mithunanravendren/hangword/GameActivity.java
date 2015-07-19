@@ -23,7 +23,6 @@ public class GameActivity extends Activity implements View.OnClickListener {
     int mGuessedLetters = 0;
     int mPoints = 0;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -235,17 +234,6 @@ public class GameActivity extends Activity implements View.OnClickListener {
         mWord = randomWord;
     }
 
-    /**
-     * letterPressed = Logic to:
-     * Check if letter pressed is in the word
-     * Run method to show which letter in what position
-     * Add to number of guessed letters
-     * Display wrong letter
-     * Display toast if it is not
-     * Run methods if entire word is guessed
-     *
-     * @param mLetterPressed
-     */
     public void letterPressed(String mLetterPressed){
         char charPressed = mLetterPressed.charAt(0);
         boolean letterGuessed = false;
@@ -277,6 +265,63 @@ public class GameActivity extends Activity implements View.OnClickListener {
             setRandomWord();
         }
     }
+
+    public void clearScreen(){
+        //clear the guessed letters
+        TextView textViewFailed = (TextView) findViewById(R.id.textView7);
+        textViewFailed.setText("");
+
+        //reset counters
+        mGuessedLetters = 0;
+        mFailCounter = 0;
+
+        //Clear the spots where the letters were filled in
+        LinearLayout layoutLetters = (LinearLayout) findViewById(R.id.layoutLetters);
+        for (int i=0 ; i < layoutLetters.getChildCount() ; i++){
+            TextView currentTextView = (TextView) layoutLetters.getChildAt(i);
+            currentTextView.setText("_");
+        }
+
+        //Reset the image
+        ImageView imageView = (ImageView) findViewById(R.id.imageView);
+        imageView.setImageResource(R.drawable.hangdroid_0);
+
+    }
+
+    public void letterFailed(String letterFailed){
+
+        TextView textViewFailed = (TextView) findViewById(R.id.textView7);
+        String previousFail = textViewFailed.getText().toString();
+        textViewFailed.setText(previousFail + letterFailed);
+
+        mFailCounter++;
+        ImageView imageView = (ImageView) findViewById(R.id.imageView);
+
+        if(mFailCounter == 1) {
+            imageView.setImageResource(R.drawable.hangdroid_1);
+        }else if (mFailCounter == 2){
+            imageView.setImageResource(R.drawable.hangdroid_2);
+        }else if (mFailCounter == 3){
+            imageView.setImageResource(R.drawable.hangdroid_3);
+        }else if (mFailCounter == 4){
+            imageView.setImageResource(R.drawable.hangdroid_4);
+        }else if (mFailCounter == 5){
+            imageView.setImageResource(R.drawable.hangdroid_5);
+        }else if (mFailCounter == 6){
+            Intent gameOverIntent = new Intent(this,GameOverActivity.class);
+            gameOverIntent.putExtra("POINTS_IDENTIFIER",mPoints);
+            startActivity(gameOverIntent);
+            finish();
+        }
+    }
+
+    public void showLettersAtIndex(int position, char letterGuessed){
+        LinearLayout layoutLetter = (LinearLayout) findViewById(R.id.layoutLetters);
+        TextView textView = (TextView) layoutLetter.getChildAt(position);
+        textView.setText(Character.toString(letterGuessed));
+    }
+
+
 
 
     /**
@@ -327,89 +372,6 @@ public class GameActivity extends Activity implements View.OnClickListener {
 
 
 
-    public void clearScreen(){
-        //clear the guessed letters
-        TextView textViewFailed = (TextView) findViewById(R.id.textView7);
-        textViewFailed.setText("");
-
-        //reset counters
-        mGuessedLetters = 0;
-        mFailCounter = 0;
-
-        //Clear the spots where the letters were filled in
-        LinearLayout layoutLetters = (LinearLayout) findViewById(R.id.layoutLetters);
-        for (int i=0 ; i < layoutLetters.getChildCount() ; i++){
-            TextView currentTextView = (TextView) layoutLetters.getChildAt(i);
-            currentTextView.setText("_");
-        }
-
-        //Reset the image
-        ImageView imageView = (ImageView) findViewById(R.id.imageView);
-        imageView.setImageResource(R.drawable.hangdroid_0);
-
-    }
 
 
-    public void letterFailed(String letterFailed){
-
-        TextView textViewFailed = (TextView) findViewById(R.id.textView7);
-        String previousFail = textViewFailed.getText().toString();
-        textViewFailed.setText(previousFail+letterFailed);
-
-        mFailCounter++;
-        ImageView imageView = (ImageView) findViewById(R.id.imageView);
-
-        if(mFailCounter == 1) {
-            imageView.setImageResource(R.drawable.hangdroid_1);
-        }else if (mFailCounter == 2){
-            imageView.setImageResource(R.drawable.hangdroid_2);
-        }else if (mFailCounter == 3){
-            imageView.setImageResource(R.drawable.hangdroid_3);
-        }else if (mFailCounter == 4){
-            imageView.setImageResource(R.drawable.hangdroid_4);
-        }else if (mFailCounter == 5){
-            imageView.setImageResource(R.drawable.hangdroid_5);
-        }else if (mFailCounter == 6){
-
-            Intent gameOverIntent = new Intent(this,GameOverActivity.class);
-            gameOverIntent.putExtra("POINTS_IDENTIFIER",mPoints);
-            startActivity(gameOverIntent);
-            finish();
-        }
-    }
-
-    /**
-     * Display a letter guessed by the user
-     * @param position
-     * @param letterGuessed
-     */
-    public void showLettersAtIndex(int position, char letterGuessed){
-        LinearLayout layoutLetter = (LinearLayout) findViewById(R.id.layoutLetters);
-        TextView textView = (TextView) layoutLetter.getChildAt(position);
-        textView.setText(Character.toString(letterGuessed));
-    }
-
-
-
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.menu_game, menu);
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        int id = item.getItemId();
-//
-//        //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
-//
-//        return super.onOptionsItemSelected(item);
-//    }
 }

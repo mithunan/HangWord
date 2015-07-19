@@ -31,12 +31,10 @@ public class MainActivity extends Activity {
         startActivity(myIntent);
     }
 
-
     public void startMultiGame(View v){
         Intent myIntent = new Intent(this,MultiplayerActivity.class);
         startActivity(myIntent);
     }
-
 
     public void openScores(View v){
         Intent myIntent = new Intent(this,ScoresActivity.class);
