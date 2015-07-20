@@ -1,6 +1,8 @@
 package com.mithunanravendren.hangword;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.Image;
 import android.os.Bundle;
@@ -28,6 +30,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
         setRandomWord();
+        createTextViews(mWord);
 
         Button a = (Button) findViewById(R.id.btnA);
         a.setOnClickListener(this); // calling onClick() method
@@ -224,7 +227,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
     }
 
     public void setRandomWord(){
-        String words = "WORD BIRD HERD STOP MUST";
+        String words = "WAR BI HERDER STEEP MOSTEST";
         String[] arrayWords = words.split(" ");
 
         Log.d("MYLOG","The Array length "+arrayWords.length);
@@ -234,9 +237,20 @@ public class GameActivity extends Activity implements View.OnClickListener {
         mWord = randomWord;
     }
 
+    public void createTextViews(String mWord){
+        LinearLayout layoutLetters = (LinearLayout) findViewById(R.id.layoutLetters);
+
+        for (int i = 0; i < mWord.length() ; i++){
+            TextView newTextView = (TextView) getLayoutInflater().inflate(R.layout.textview,null);
+            layoutLetters.addView(newTextView);
+        }
+    }
+
     public void letterPressed(String mLetterPressed){
         char charPressed = mLetterPressed.charAt(0);
         boolean letterGuessed = false;
+
+        disableButton(mLetterPressed);
 
         //check if letter is in word to guess
         for ( int i = 0 ; i < mWord.length() ; i++){
@@ -246,6 +260,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
                 letterGuessed = true;
                 showLettersAtIndex(i,charPressed);
                 mGuessedLetters++;
+
             }else{
 
             }
@@ -259,10 +274,42 @@ public class GameActivity extends Activity implements View.OnClickListener {
         if (mGuessedLetters == mWord.length()){
             //SCORE ONE POINT
             mPoints++;
+
+
+            AlertDialog alertDialog = new AlertDialog.Builder(GameActivity.this).create();
+            alertDialog.setTitle("You Solved: "+ mWord);
+            alertDialog.setMessage("You currently have "+mPoints+" point(s)");
+            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Next Level",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            alertDialog.show();
+
             //CLEAR THE PREVIOUS WORD
             clearScreen();
             //START THE NEXT LEVEL
             setRandomWord();
+            createTextViews(mWord);
+
+
+        }
+    }
+
+    public void disableButton (String mLetterPressed){
+        int letterPressed = getResources().getIdentifier("btn" + mLetterPressed, "id", getPackageName());
+        Button disableBtn = (Button) findViewById(letterPressed);
+        disableBtn.setEnabled(false);
+    }
+
+    public void enableButton (){
+        char letter[] = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'};
+        for (int i=0 ; i < 26 ; i++ ){
+            char iLetter = letter[i];
+            int letterPressed = getResources().getIdentifier("btn" + iLetter, "id", getPackageName());
+            Button disableBtn = (Button) findViewById(letterPressed);
+            disableBtn.setEnabled(true);
         }
     }
 
@@ -281,10 +328,15 @@ public class GameActivity extends Activity implements View.OnClickListener {
             TextView currentTextView = (TextView) layoutLetters.getChildAt(i);
             currentTextView.setText("_");
         }
+        layoutLetters.removeAllViewsInLayout();
 
         //Reset the image
         ImageView imageView = (ImageView) findViewById(R.id.imageView);
         imageView.setImageResource(R.drawable.hangdroid_0);
+
+        //reset the buttons to enabled
+        enableButton();
+
 
     }
 
@@ -308,10 +360,33 @@ public class GameActivity extends Activity implements View.OnClickListener {
         }else if (mFailCounter == 5){
             imageView.setImageResource(R.drawable.hangdroid_5);
         }else if (mFailCounter == 6){
-            Intent gameOverIntent = new Intent(this,GameOverActivity.class);
-            gameOverIntent.putExtra("POINTS_IDENTIFIER",mPoints);
-            startActivity(gameOverIntent);
-            finish();
+
+            AlertDialog alertDialog = new AlertDialog.Builder(GameActivity.this).create();
+            alertDialog.setTitle("The word is: " + mWord);
+            alertDialog.setMessage("You have " + mPoints + " point(s)");
+            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Save your Score",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            Intent gameOverIntent = new Intent(GameActivity.this, GameOverActivity.class);
+                            gameOverIntent.putExtra("POINTS_IDENTIFIER", mPoints);
+                            startActivity(gameOverIntent);
+                            finish();
+                        }
+                    });
+            alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Restart the Level",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            //CLEAR THE PREVIOUS WORD
+                            clearScreen();
+                            //START THE NEXT LEVEL
+                            setRandomWord();
+                            createTextViews(mWord);
+                        }
+                    });
+            alertDialog.show();
+
         }
     }
 
@@ -369,9 +444,5 @@ public class GameActivity extends Activity implements View.OnClickListener {
             setRandomWord();
         }
     }
-
-
-
-
 
 }

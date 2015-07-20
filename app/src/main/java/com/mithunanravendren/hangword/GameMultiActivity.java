@@ -323,7 +323,6 @@ public class GameMultiActivity extends Activity implements View.OnClickListener 
 
 
 
-
     /**
      * Retrieving the letter introduced on the editText
      * @param v (button clicked)
